@@ -20,9 +20,23 @@ public class Ex6ClassObjects {
 
     void program() {
         // -------- Input ------------
-
+        Hero no1 = new Hero();
+        no1.name = "Sportacuz";
+        no1.strength = 9001;
+        Hero no2 = new Hero();
+        no2.name = "Mr Dank";
+        no2.strength  = 42069;
 
         // ------- Output --------------
+        if(no2.strength > no1.strength){
+            out.println(no2.name + " is the WINNER!!");
+        }
+        else if(no2.strength < no1.strength){
+            out.println(no1.name + " is the WINNER!!");
+        }
+        else{
+            out.println("WOW, THEY'RE IDENTICAL!");
+        }
 
     }
 

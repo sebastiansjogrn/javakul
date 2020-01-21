@@ -21,14 +21,20 @@ public class Ex7ObjectArrays {
 
     void program() {
         // Create (new) and initialize hero objects using the constructor
-        Hero[] heroes = {new Hero("Attila", 45), new Hero("Amber", 41),
+        Hero[] heroes = {new Hero("Attila", 67), new Hero("Amber", 41),
                 new Hero("Plexus", 52), new Hero("Elektra", 50),
-                new Hero("Furia", 38), new Hero("Tor", 51)};
+                new Hero("Furia", 38), new Hero("Tor", 51),
+                new Hero("Sportacuz", 9001)};
 
        // TODO
+        int strongestIndex = 0;
+            for(int n=1;n<heroes.length;n++){
+                if((heroes[n].strength) > (heroes[strongestIndex].strength)){
+                    strongestIndex = n;
+                }
+            }
 
-
-       // out.println("Strongest hero is " + heroes[strongestIndex].name);
+        out.println("Strongest hero is " + heroes[strongestIndex].name);
     }
 
     // ------ The class to use  -----------

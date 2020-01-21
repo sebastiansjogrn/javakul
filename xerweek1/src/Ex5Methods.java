@@ -20,8 +20,8 @@ public class Ex5Methods {
         out.println(sumTo(23) == 276);
         out.println(factorial(3) == 6);    // 3 * 2 * 1 = 6
         out.println(factorial(5) == 120);
-        //out.println(digitSum(1111) == 4);   // 1 + 1 + 1 + 1 = 4
-        //out.println(digitSum(12345) == 15);
+        out.println(digitSum(1111) == 4);   // 1 + 1 + 1 + 1 = 4
+        out.println(digitSum(12345) == 15);
 
         String winner = "Olle";
         // A special case, should print: "Winner is Olle" (or whatever name)
@@ -30,14 +30,15 @@ public class Ex5Methods {
 
     // ------ Write methods below this  -----------
 
-   // TODO
-    int sumTo(int i){
+    // TODO
+    int sumTo(int i) {
         int s = 0;
-        for(int n=1;n<=i;n++){
+        for (int n = 1; n <= i; n++) {
             s += n;
         }
         return s;
     }
+
     int factorial(int i) {
         int s = 1;
         for (int n = 1; n <= i; n++) {
@@ -45,9 +46,15 @@ public class Ex5Methods {
         }
         return s;
     }
-    int digitsum(int i){
-        toString()
-        return ;
+
+    int digitSum(int i) {
+        String s = Integer.toString(i);
+        int sum = 0;
+        for (int n = 0; n < s.length(); n++) {
+            int j = Character.getNumericValue(s.charAt(n));
+            sum += j;
+        }
+        return sum;
     }
 
 }

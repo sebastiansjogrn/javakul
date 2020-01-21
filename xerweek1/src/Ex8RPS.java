@@ -42,10 +42,32 @@ public class Ex8RPS {
 
         while (round < maxRounds) {   // Game loop
             // -------- Input --------------
-
+            out.println("Do you choose rock(1), paypal(2) or scissors(3)?");
+            human = sc.nextInt();
+            computer = rand.nextInt(3) +1;
+            out.println(computer);
 
             // ----- Process -----------------
-
+            if(human%3 == (computer-1)){
+                total += 1;
+                out.println("You beat!");
+            }else if(computer%3 == (human-1)){
+                total -= 1;
+                out.println("You no beat!");
+            }else{
+                out.println("    ______\n" +
+                        "   /(    )\\\n" +
+                        "   \\ \\  / /\n" +
+                        "    \\/[]\\/\n" +
+                        "      /\\\n" +
+                        "     |  |\n" +
+                        "     |  |\n" +
+                        "     |  |\n" +
+                        "     |  |\n" +
+                        "     |  |\n" +
+                        "     \\  /   \n" +
+                        "      \\/");
+            }
 
             // ---------- Output --------------
 

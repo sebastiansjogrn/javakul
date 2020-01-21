@@ -43,7 +43,18 @@ public class Ex9TicTacToe {
         }
 
         // TODO Game loop
-
+        for(int n=0;n<board.length;n++){
+//            out.println("Choose a postition (1-9)" + current.name);
+//            int position = sc.nextInt();
+//            while(board[position] != '-'){
+//               out.println("Wrong, pick again");
+//               position = sc.nextInt();
+//            }
+            int position = getPlayerSelection(current);
+            board[position] = current.mark;
+            plotBoard(board);
+            winner = checkWinner();
+        }
         out.println("Game over!");
         plotBoard(board);
 
@@ -72,12 +83,12 @@ public class Ex9TicTacToe {
         int selection;
         while (true) {
             out.println("Player is " + player.name + "(" + player.mark + ")");
-            out.print("Select position to put mark (0-8) > ");
-            selection = sc.nextInt();
+            out.print("Select position to put mark (1-9) > ");
+            selection = sc.nextInt() -1;
             if (0 <= selection && selection <= 8) {
                 break;
             }
-            out.println("Bad choice (0-8 allowed)");
+            out.println("Bad choice (1-9 allowed)");
         }
         return selection;
     }
