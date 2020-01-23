@@ -27,8 +27,8 @@ public class Ex9TicTacToe {
     void program() {
         //test();       // <--------- Comment out to test
 
-        Player p1 = new Player("olle", 'X');
-        Player p2 = new Player("fia", 'O');
+        Player p1 = new Player("sebbe", 'L');
+        Player p2 = new Player("Macquanne", 'M');
         Player current;
         Player winner = null;
         char[] board = createBoard();
@@ -43,7 +43,7 @@ public class Ex9TicTacToe {
         }
 
         // TODO Game loop
-        for(int n=0;n<board.length;n++){
+        for (int n = 0; n < board.length; n++) {
 //            out.println("Choose a postition (1-9)" + current.name);
 //            int position = sc.nextInt();
 //            while(board[position] != '-'){
@@ -53,7 +53,11 @@ public class Ex9TicTacToe {
             int position = getPlayerSelection(current);
             board[position] = current.mark;
             plotBoard(board);
-            winner = checkWinner();
+            if (checkWinner(board, position)) {
+                winner = current;
+                break;
+            }
+            current = switcheroonie(current, p1, p2);
         }
         out.println("Game over!");
         plotBoard(board);
@@ -84,7 +88,7 @@ public class Ex9TicTacToe {
         while (true) {
             out.println("Player is " + player.name + "(" + player.mark + ")");
             out.print("Select position to put mark (1-9) > ");
-            selection = sc.nextInt() -1;
+            selection = sc.nextInt() - 1;
             if (0 <= selection && selection <= 8) {
                 break;
             }
@@ -99,6 +103,46 @@ public class Ex9TicTacToe {
             if ((i + 1) % 3 == 0) {
                 out.println();
             }
+        }
+    }
+
+    Boolean checkWinner(char[] board, int position) {
+        char mark = board[position];
+        //Columns3
+        for (int n=1;n<5;n++){
+            if (n==2){
+                n=3;
+            }
+            if(mark == board[(position+n)%9] && mark == board[(position+2*n)%9]){
+                return true;
+            }
+        }
+        //Rows
+        for(int n=0;n<8;n+=3){
+            if(board[n] == board[n+1] && board[n+1] == board[n+2] && board[n] == mark){
+                return true;
+            }
+        }
+        //Diagonals
+        for(int n = 0;n<3;n++){
+            if(position%2 != 0){
+                break;
+            }
+            if(board[0] + board[4] + board[8] == mark + mark + mark){
+                return true;
+            }
+            if(board[2] + board[4] + board[6] == mark + mark + mark){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    Player switcheroonie(Player current, Player p1, Player p2) {
+        if (current == p1) {
+            return p2;
+        } else {
+            return p1;
         }
     }
 
