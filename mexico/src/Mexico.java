@@ -19,7 +19,7 @@ public class Mexico {
     final Random rand = new Random();
     final Scanner sc = new Scanner(in);
     final int maxRolls = 3;      // No player may exceed this
-    final int startAmount = 2/*3*/;   // Money for a player. Select any
+    final int startAmount = 3;   // Money for a player. Select any
     final int mexico = 1000;     // A value greater than any other
 
     void program() {
@@ -195,21 +195,10 @@ public class Mexico {
     // ---------- IO methods -----------------------
 
     Player[] getPlayers() {
-        // Ugly for now. If using a constructor this may
-        // be cleaned up.
-        Player[] players = new Player[3];
-        Player p1 = new Player();
-        p1.name = "Olle";
-        p1.amount = startAmount;
-        Player p2 = new Player();
-        p2.name = "Fia";
-        p2.amount = startAmount;
-        Player p3 = new Player();
-        p3.name = "Lisa";
-        p3.amount = startAmount;
-        players[0] = p1;
-        players[1] = p2;
-        players[2] = p3;
+        Player[] players = {new Player("Olle", startAmount, 0, 0, 0),
+                new Player("Fia", startAmount, 0, 0, 0),
+                new Player("Lisa", startAmount, 0, 0, 0)};
+
         return players;
     }
 
@@ -244,6 +233,14 @@ public class Mexico {
         int fstDice;  // Result of first dice
         int secDice;  // Result of second dice
         int nRolls;   // Current number of rolls
+
+        public Player(String n, int cash, int d1, int d2, int rolls) {
+            name = n;
+            amount = cash;
+            fstDice = d1;
+            secDice = d2;
+            nRolls = rolls;
+        }
     }
 
     /**************************************************
@@ -257,16 +254,10 @@ public class Mexico {
     void test() {
         // A few hard coded player to use for test
         // NOTE: Possible to debug tests from here, very efficient!
-        Player[] ps = {new Player(), new Player(), new Player()};
-        ps[0].fstDice = 2;
-        ps[0].secDice = 6;
-        ps[0].name = "Olle 1";
-        ps[1].fstDice = 6;
-        ps[1].secDice = 5;
-        ps[1].name = "Fia 2";
-        ps[2].fstDice = 1;
-        ps[2].secDice = 1;
-        ps[2].name = "Lisa 3";
+        Player[] ps = {new Player("Olle", 2, 2, 6, 1),
+                new Player("Fia", 3, 6, 5, 2),
+                new Player("Lisa", 1, 1, 1, 1)};
+
         //out.println(next(ps, ps[0]) == ps[1]);
         //out.println(next(ps, ps[1]) == ps[2]);
         //out.println(next(ps, ps[2]) == ps[0]);
@@ -275,9 +266,11 @@ public class Mexico {
         //out.println(getScore(ps[1]) == 65);
         //out.println(next(ps, ps[0]) == ps[1]);
         //out.println(getLoser(ps) == ps[0]);
-        out.println(removeLoser(ps, ps[0])[0].name + removeLoser(ps, ps[0])[1].name);
-        out.println(removeLoser(ps, ps[1])[0].name + removeLoser(ps, ps[1])[1].name);
-        out.println(removeLoser(ps, ps[2])[0].name + removeLoser(ps, ps[2])[1].name);
+        //out.println(removeLoser(ps, ps[0])[0].name + removeLoser(ps, ps[0])[1].name);
+        //out.println(removeLoser(ps, ps[1])[0].name + removeLoser(ps, ps[1])[1].name);
+        //out.println(removeLoser(ps, ps[2])[0].name + removeLoser(ps, ps[2])[1].name);
+//        Player p1 = new Player("Bertil", 7, 0, 0, 0);
+//        out.println(p1.name + p1.amount);
 
         exit(0);
     }
