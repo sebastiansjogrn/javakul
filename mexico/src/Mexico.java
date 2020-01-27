@@ -1,4 +1,5 @@
 
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -29,8 +30,9 @@ public class Mexico {
         Player current;      // Current player for round
         Player leader;       // Player starting the round
         int max = maxRolls;  // Max rolls for the round
-        boolean ongoing = false;
-        boolean round_over = false;
+        boolean ongoing = false;        // Indicates if the game has moved on from the leader
+        boolean round_over = false;     // Indicates if the round is over
+        boolean returnRolls = true;     // Indicates if dice results should be displayed
 
         players = getPlayers();
         current = getRandomPlayer(players);
@@ -52,13 +54,18 @@ public class Mexico {
                     dice = diceRoll();
                     current.fstDice = dice[0];
                     current.secDice = dice[1];
+                    returnRolls = true;
+
                 } else {
-                    out.println("You roll to  much, greedy boi.\n");
+                    out.println("No rolls left.\n");
                     current = next(players, current);
                     ongoing = true;
+                    returnRolls = false;
                 }
                 // ---- Out --------
-                roundMsg(current);
+                if (returnRolls) {
+                    roundMsg(current);
+                }
 
             } else if ("n".equals(cmd)) {
                 // Process
@@ -75,7 +82,6 @@ public class Mexico {
             if (current == leader && ongoing) {
                 round_over = true;
             }
-            //*******************************************************************Loser aren't removed, plz fix, finish game when one player left.
             if (round_over) {
                 // --- Process -----
                 pot++;
@@ -85,7 +91,7 @@ public class Mexico {
                 loser.amount--;
                 if (loser.amount == 0) {
                     current = next(players, loser);
-                    removeLoser(players, loser);
+                    players = removeLoser(players, loser);
                 } else {
                     current = loser;
                 }
@@ -135,9 +141,11 @@ public class Mexico {
 
     Player[] removeLoser(Player[] players, Player loser) {
         Player[] nPlayers = new Player[players.length - 1];
-        for (int n = 0; n < nPlayers.length; n++) {
+        int i = 0;
+        for (int n = 0; n < players.length; n++) {
             if (players[n] != loser) {
-                nPlayers[n] = players[n];
+                nPlayers[i] = players[n];
+                i++;
             }
         }
         return nPlayers;
@@ -189,19 +197,19 @@ public class Mexico {
     Player[] getPlayers() {
         // Ugly for now. If using a constructor this may
         // be cleaned up.
-        Player[] players = new Player[2/*3*/];
+        Player[] players = new Player[3];
         Player p1 = new Player();
-        p1.name = "Markus"/*"Olle"*/;
+        p1.name = "Olle";
         p1.amount = startAmount;
         Player p2 = new Player();
-        p2.name = "Sebbestian"/*"Fia"*/;
+        p2.name = "Fia";
         p2.amount = startAmount;
         Player p3 = new Player();
         p3.name = "Lisa";
         p3.amount = startAmount;
         players[0] = p1;
         players[1] = p2;
-//        players[2] = p3;
+        players[2] = p3;
         return players;
     }
 
@@ -252,10 +260,13 @@ public class Mexico {
         Player[] ps = {new Player(), new Player(), new Player()};
         ps[0].fstDice = 2;
         ps[0].secDice = 6;
+        ps[0].name = "Olle 1";
         ps[1].fstDice = 6;
         ps[1].secDice = 5;
+        ps[1].name = "Fia 2";
         ps[2].fstDice = 1;
         ps[2].secDice = 1;
+        ps[2].name = "Lisa 3";
         //out.println(next(ps, ps[0]) == ps[1]);
         //out.println(next(ps, ps[1]) == ps[2]);
         //out.println(next(ps, ps[2]) == ps[0]);
@@ -264,6 +275,9 @@ public class Mexico {
         //out.println(getScore(ps[1]) == 65);
         //out.println(next(ps, ps[0]) == ps[1]);
         //out.println(getLoser(ps) == ps[0]);
+        out.println(removeLoser(ps, ps[0])[0].name + removeLoser(ps, ps[0])[1].name);
+        out.println(removeLoser(ps, ps[1])[0].name + removeLoser(ps, ps[1])[1].name);
+        out.println(removeLoser(ps, ps[2])[0].name + removeLoser(ps, ps[2])[1].name);
 
         exit(0);
     }
