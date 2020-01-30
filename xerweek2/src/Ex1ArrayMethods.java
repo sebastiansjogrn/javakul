@@ -38,14 +38,14 @@ public class Ex1ArrayMethods {
         out.println(count(arr, 0) == 50);
 
         // Generate array with 14 elements with 40% 1's and 30% -1's
-        //arr = generateDistribution(14, 0.4, 0.3);
-        //out.println(count(arr, 1) == 6);
-        //out.println(count(arr, -1) == 4);
+        arr = generateDistribution(14, 0.4, 0.3);
+        out.println(count(arr, -1) == 6);
+        out.println(count(arr, 1) == 4);
 
         for (int i = 0; i < 10; i++) {
             // Random reordering of arr, have to check by inspecting output
-            //shuffle(arr);
-            //out.println(Arrays.toString(arr));  // Does it look random?
+            shuffle(arr);
+            out.println(Arrays.toString(arr));  // Does it look random?
         }
     }
 
@@ -64,18 +64,25 @@ public class Ex1ArrayMethods {
 
     int[] generateDistribution(int amount, double prc1, double prc2){
         int [] nArr = new int [amount];
-        double am1 = amount*prc1;
-        double am2 = amount*prc2;
-        for(int n=0;n<amount;n++){
-            int randome = rand.nextInt(amount);
-            if (randome < am1){
-                nArr[n]=-1;
-            }
-            if (randome > am1 && randome < (am1+am2)){
-                nArr[n]=1;
-            }
+        int am1 = (int)Math.round(amount*prc1);
+        int am2 = (int)Math.round(amount*prc2);
+        for(int i=0;i<am1;i++){
+            nArr[i] = -1;
+        }
+        for(int i=am1;i<am1+am2;i++){
+            nArr[i] = 1;
         }
         return nArr;
+    }
+
+    int[] shuffle(int[] arr){
+        for(int i = arr.length-1;i>=0;i--){
+            int j = rand.nextInt(i+1);
+            int tmp = arr[i];
+            arr[i]=arr[j];
+            arr[j] = tmp;
+        }
+        return arr;
     }
 
 }
