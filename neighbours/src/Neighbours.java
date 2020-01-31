@@ -39,8 +39,6 @@ public class Neighbours extends Application {
     // This variable may *only* be used in methods init() and updateWorld()
     Actor[][] world;              // The world is a square matrix of Actors
 
-    Random rand = new Random();
-
     // This is the method called by the timer to update the world
     // (i.e move unsatisfied) approx each 1/60 sec.
     void updateWorld() {
@@ -48,6 +46,9 @@ public class Neighbours extends Application {
         double threshold = 0.7;
 
         // TODO update world
+
+        Actor[] dudes = unsatisfied(world, threshold);
+        int[] freeRealEstate = emptySpaces(world);
     }
 
     // This method initializes the world variable with a random distribution of Actors
@@ -55,7 +56,7 @@ public class Neighbours extends Application {
     // That's why we must have "@Override" and "public" (just accept for now)
     @Override
     public void init() {
-        //test();    // <---------------- Uncomment to TEST!
+        test();    // <---------------- Uncomment to TEST!
 
         // %-distribution of RED, BLUE and NONE
         double[] dist = {0.25, 0.25, 0.50};
@@ -82,13 +83,13 @@ public class Neighbours extends Application {
     Actor[][] generateWorld(double[] dist, int nLocations) {
         double prcR = dist[0];
         double prcB = dist[1];
-        Actor [] arr = new Actor [nLocations];
-        int am1 = (int)Math.round(nLocations*prcR);
-        int am2 = (int)Math.round(nLocations*prcB);
-        for(int i=0;i<am1;i++){
+        Actor[] arr = new Actor[nLocations];
+        int am1 = (int) Math.round(nLocations * prcR);
+        int am2 = (int) Math.round(nLocations * prcB);
+        for (int i = 0; i < am1; i++) {
             arr[i] = new Actor(Color.BLUE);
         }
-        for(int i=am1;i<am1+am2;i++){
+        for (int i = am1; i < am1 + am2; i++) {
             arr[i] = new Actor(Color.RED);
         }
         arr = shuffle(arr);
@@ -96,9 +97,70 @@ public class Neighbours extends Application {
         return matrix;
     }
 
-    Actor[][] isSatisfied(Actor[][] world){
-        
-        return world;
+    boolean isSatisfied(Actor[][] world, int size, int row, int col, double threshold) {
+        double neighbours = -1;
+        double goodNeighbours = -1;
+        if(isValidLocation(size, row, col) && world[row][col] != null) {
+            Color color = world[row][col].color;
+            for (int r=row-1;r<=row+1;r++){
+                for(int c=col-1;c<=col+1;c++){
+                    if(isValidLocation(size, r, c)) {
+                        if (world[r][c] != null) {
+                            if (color == world[r][c].color) {
+                                goodNeighbours++;
+                                neighbours++;
+                            } else {
+                                neighbours++;
+                            }
+                        }
+                    }
+                }
+            }
+        }else{
+            neighbours++;
+            goodNeighbours++;
+        }
+        boolean satisfied = false;                   //Obs! null ain't satisfied and might be moved with the actors??
+        if(neighbours != 0 && goodNeighbours != 0) {
+            satisfied = goodNeighbours / neighbours >= threshold;
+        }
+        if(world[row][col] == null){
+            satisfied =true;
+        }
+        return satisfied;
+    }
+
+    Actor[] unsatisfied(Actor[][] world, double threshold){
+        int size = world.length;
+        int count=0;
+        Actor[] tmpNotsatisifed = new Actor[size*size];
+        for(int r = 0;r<size;r++){
+            for(int c = 0;c<size;c++){
+                if(!isSatisfied(world, size, r,c,threshold)){
+                  tmpNotsatisifed[count] = world[r][c];
+                  count++;
+                }
+            }
+        }
+        Actor[] notsatisifed = new Actor[count];
+        for(int i=0;i<count;i++){
+            notsatisifed[i]=tmpNotsatisifed[i];
+        }
+        return notsatisifed;
+    }
+
+    int[] emptySpaces(Actor[][] world){
+        Actor[] worldArr = matrix2arr(world);
+        int[] indexes = new int[countNull(world)];
+        int count = 0;
+        for(int i=0;i<worldArr.length;i++){
+            if(worldArr[i] == null){
+                indexes[count] = i;
+                count++;
+            }
+        }
+        indexes = shuffleInt(indexes);
+        return indexes;
     }
 
     // ----------- Utility methods -----------------
@@ -122,7 +184,7 @@ public class Neighbours extends Application {
     }
 
     Actor[][] arr2matrix(Actor[] arr) {
-        int nRC = (int)Math.round(sqrt(arr.length));
+        int nRC = (int) Math.round(sqrt(arr.length));
         Actor[][] matrix = new Actor[nRC][nRC];
         int k = 0;
         for (int r = 0; r < nRC; r++) {
@@ -134,15 +196,53 @@ public class Neighbours extends Application {
         return matrix;
     }
 
-    Actor[] shuffle(Actor[] arr){
-        for(int i = arr.length-1;i>=0;i--){
-            int j = rand.nextInt(i+1);
+    Actor[] shuffle(Actor[] arr) {
+        Random rand = new Random();
+        for (int i = arr.length - 1; i >= 0; i--) {
+            int j = rand.nextInt(i + 1);
             Actor tmp = arr[i];
-            arr[i]=arr[j];
+            arr[i] = arr[j];
             arr[j] = tmp;
         }
         return arr;
     }
+
+    int[]shuffleInt(int[] arr) {
+        Random rand = new Random();
+        for (int i = arr.length - 1; i >= 0; i--) {
+            int j = rand.nextInt(i + 1);
+            int tmp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = tmp;
+        }
+        return arr;
+    }
+
+    int countNull(Actor[][] world){
+        int nNull = 0;
+        Actor[] arr = matrix2arr(world);
+        for(int i=0;i<arr.length;i++){
+            if(arr[i] == null){
+                nNull++;
+            }
+        }
+        return nNull;
+    }
+
+    /*Actor[] purgeNull(Actor[] arr){
+        int nNull = 0;
+        for(int i=0;i<arr.length;i++){
+            if(arr[i] == null){
+                nNull++;
+            }
+        }
+        Actor[] nArr = new Actor[arr.length - nNull];
+        int k = 0;
+        for(int i=0;i<arr.length;i++){
+
+        }
+        return nArr;
+    }*/
 
     // ------- Testing -------------------------------------
 
@@ -151,30 +251,36 @@ public class Neighbours extends Application {
     void test() {
         // A small hard coded world for testing
         Actor[][] testWorld = new Actor[][]{
-                {new Actor(Color.RED), new Actor(Color.RED), null},
-                {null, new Actor(Color.BLUE), null},
-                {new Actor(Color.RED), null, new Actor(Color.BLUE)}
+                {new Actor(Color.BLUE), new Actor(Color.RED), null},
+                {null,                  new Actor(Color.RED), null},
+                {new Actor(Color.BLUE), null,                   new Actor(Color.BLUE)}
         };
         double th = 0.5;   // Simple threshold used for testing
 
         int size = testWorld.length;
-        out.println(isValidLocation(size, 0, 0));
-        out.println(!isValidLocation(size, -1, 0));
-        out.println(!isValidLocation(size, 0, 3));
+        //out.println(isValidLocation(size, 0, 0));
+        //out.println(!isValidLocation(size, -1, 0));
+        //out.println(!isValidLocation(size, 0, 3));
 
         // TODO
 
-        double[] dist = {0.25, 0.25, 0.50};
+        /*double[] dist = {0.25, 0.25, 0.50};
         int nLoc = 25;
         Actor[][] testWorld2 = generateWorld(dist, nLoc);
         Actor[] testArr = matrix2arr(testWorld2);
-        for(int i=0;i<nLoc;i++){
-            if(testArr[i] != null) {
+        for (int i = 0; i < nLoc; i++) {
+            if (testArr[i] != null) {
                 out.println(testArr[i].color);
-            }else{
+            } else {
                 out.println("null");
             }
-        }
+        }*/
+
+        //out.println((isSatisfied(testWorld, 9, 1, 0, th)==false));
+        //out.println((isSatisfied(testWorld, 9, 1, 1, 1.0)==false));
+        //out.println((isSatisfied(testWorld, 9, 2, 2, th)==true));
+        //out.println(Arrays.toString(unsatisfied(testWorld, th)));
+        out.println(Arrays.toString(emptySpaces(testWorld)));
 
         exit(0);
     }
