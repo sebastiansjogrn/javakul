@@ -46,20 +46,10 @@ public class Neighbours extends Application {
         double threshold = 0.7;
 
         // TODO update world
-        if (countNull(world) < 450) {
-            out.println("TOO FEW REALESTATES, ONLY " + countNull(world));
-        } else {
-            out.println("Null: " + countNull(world));
-        }
 
-        out.println("Actors: " + countActor(world));
-
-
-        int[] freeRealEstate = emptySpaces(world);
-        Actor[] dudes = unsatisfied(world, threshold);
-        out.println("Unsatisfied: " + dudes.length);
-//        world = purgeUnsatisfied(world, threshold);
-        world = placement(world, dudes, freeRealEstate);
+        int[] empty = emptySpaces(world);
+        Actor[] actors = unsatisfied(world, threshold);
+        world = placement(world, actors, empty);
     }
 
     // This method initializes the world variable with a random distribution of Actors
@@ -72,7 +62,7 @@ public class Neighbours extends Application {
         // %-distribution of RED, BLUE and NONE
         double[] dist = {0.25, 0.25, 0.50};
         // Number of locations (places) in world (must be a square)
-        int nLocations = 90000;   // Should also try 90 000
+        int nLocations = 900;   // Should also try 90 000
 
         // TODO initialize the world
 
@@ -177,9 +167,6 @@ public class Neighbours extends Application {
 
     Actor[][] placement(Actor[][] world, Actor[] actors, int[] indexes) {
         Actor[] worldArr = matrix2arr(world);
-        if (indexes.length < actors.length) {
-            out.println("YOU DUN FUCKED UP BOI");
-        }
         for (int i = 0; i < actors.length; i++) {
             worldArr[indexes[i]] = actors[i];
         }
@@ -253,29 +240,6 @@ public class Neighbours extends Application {
         return nNull;
     }
 
-    int countActor(Actor[][] world) {
-        int nNull = 0;
-        Actor[] arr = matrix2arr(world);
-        for (int i = 0; i < arr.length; i++) {
-            if (arr[i] != null) {
-                nNull++;
-            }
-        }
-        return nNull;
-    }
-
-    Actor[][] purgeUnsatisfied(Actor[][] world, double threshold) {
-        for (int r = 0; r < world.length; r++) {
-            for (int c = 0; c < world.length; c++) {
-                if (!isSatisfied(world, world.length, r, c, threshold)) {
-                    world[r][c] = null;
-                }
-            }
-        }
-
-        return world;
-    }
-
     // ------- Testing -------------------------------------
 
     // Here you run your tests i.e. call your logic methods
@@ -313,14 +277,11 @@ public class Neighbours extends Application {
 
         //out.println(countNull(testWorld));
 
-        out.println((isSatisfied(testWorld, 3, 1, 0, th) == true));
-        out.println((isSatisfied(testWorld, 3, 1, 1, 1.0) == false));
-        out.println((isSatisfied(testWorld, 3, 2, 2, th) == false));
+        //out.println((isSatisfied(testWorld, 3, 1, 0, th) == true));
+        //out.println((isSatisfied(testWorld, 3, 1, 1, 1.0) == false));
+        //out.println((isSatisfied(testWorld, 3, 2, 2, th) == false));
         //out.println(Arrays.toString(unsatisfied(testWorld, th)));
         //out.println(Arrays.toString(emptySpaces(testWorld)));
-        //out.println(Arrays.toString(purgeUnsatisfied(testWorld, th)[0]));
-        //out.println(Arrays.toString(purgeUnsatisfied(testWorld, th)[1]));
-        //out.println(Arrays.toString(purgeUnsatisfied(testWorld, th)[2]));
 
         //Actor[] dude1 = new Actor[]{new Actor(Color.RED)/*, new Actor(Color.BLUE), new Actor(Color.RED)*/};
         //int[] ind = new int[] {2,3};
