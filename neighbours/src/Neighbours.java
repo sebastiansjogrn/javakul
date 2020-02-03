@@ -46,9 +46,20 @@ public class Neighbours extends Application {
         double threshold = 0.7;
 
         // TODO update world
+        if (countNull(world) < 450) {
+            out.println("TOO FEW REALESTATES, ONLY " + countNull(world));
+        } else {
+            out.println("Null: " + countNull(world));
+        }
 
-        Actor[] dudes = unsatisfied(world, threshold);
+        out.println("Actors: " + countActor(world));
+
+
         int[] freeRealEstate = emptySpaces(world);
+        Actor[] dudes = unsatisfied(world, threshold);
+        out.println("Unsatisfied: " + dudes.length);
+//        world = purgeUnsatisfied(world, threshold);
+        world = placement(world, dudes, freeRealEstate);
     }
 
     // This method initializes the world variable with a random distribution of Actors
@@ -56,12 +67,12 @@ public class Neighbours extends Application {
     // That's why we must have "@Override" and "public" (just accept for now)
     @Override
     public void init() {
-        test();    // <---------------- Uncomment to TEST!
+        //test();    // <---------------- Uncomment to TEST!
 
         // %-distribution of RED, BLUE and NONE
         double[] dist = {0.25, 0.25, 0.50};
         // Number of locations (places) in world (must be a square)
-        int nLocations = 900;   // Should also try 90 000
+        int nLocations = 90000;   // Should also try 90 000
 
         // TODO initialize the world
 
@@ -100,11 +111,11 @@ public class Neighbours extends Application {
     boolean isSatisfied(Actor[][] world, int size, int row, int col, double threshold) {
         double neighbours = -1;
         double goodNeighbours = -1;
-        if(isValidLocation(size, row, col) && world[row][col] != null) {
+        if (isValidLocation(size, row, col) && world[row][col] != null) {
             Color color = world[row][col].color;
-            for (int r=row-1;r<=row+1;r++){
-                for(int c=col-1;c<=col+1;c++){
-                    if(isValidLocation(size, r, c)) {
+            for (int r = row - 1; r <= row + 1; r++) {
+                for (int c = col - 1; c <= col + 1; c++) {
+                    if (isValidLocation(size, r, c)) {
                         if (world[r][c] != null) {
                             if (color == world[r][c].color) {
                                 goodNeighbours++;
@@ -116,51 +127,64 @@ public class Neighbours extends Application {
                     }
                 }
             }
-        }else{
+        } else {
             neighbours++;
             goodNeighbours++;
         }
-        boolean satisfied = false;                   //Obs! null ain't satisfied and might be moved with the actors??
-        if(neighbours != 0 && goodNeighbours != 0) {
+        boolean satisfied = false;
+        if (neighbours != 0 && goodNeighbours != 0) {
             satisfied = goodNeighbours / neighbours >= threshold;
         }
-        if(world[row][col] == null){
-            satisfied =true;
+        if (world[row][col] == null) {
+            satisfied = true;
         }
         return satisfied;
     }
 
-    Actor[] unsatisfied(Actor[][] world, double threshold){
+    Actor[] unsatisfied(Actor[][] world, double threshold) {
         int size = world.length;
-        int count=0;
-        Actor[] tmpNotsatisifed = new Actor[size*size];
-        for(int r = 0;r<size;r++){
-            for(int c = 0;c<size;c++){
-                if(!isSatisfied(world, size, r,c,threshold)){
-                  tmpNotsatisifed[count] = world[r][c];
-                  count++;
+        int count = 0;
+        Actor[] tmpNotsatisifed = new Actor[size * size];
+        for (int r = 0; r < size; r++) {
+            for (int c = 0; c < size; c++) {
+                if (!isSatisfied(world, size, r, c, threshold)) {
+                    tmpNotsatisifed[count] = world[r][c];
+                    world[r][c] = null;
+                    count++;
                 }
             }
         }
         Actor[] notsatisifed = new Actor[count];
-        for(int i=0;i<count;i++){
-            notsatisifed[i]=tmpNotsatisifed[i];
+        for (int i = 0; i < count; i++) {
+            notsatisifed[i] = tmpNotsatisifed[i];
         }
         return notsatisifed;
     }
 
-    int[] emptySpaces(Actor[][] world){
+    int[] emptySpaces(Actor[][] world) {
         Actor[] worldArr = matrix2arr(world);
         int[] indexes = new int[countNull(world)];
         int count = 0;
-        for(int i=0;i<worldArr.length;i++){
-            if(worldArr[i] == null){
+        for (int i = 0; i < worldArr.length; i++) {
+            if (worldArr[i] == null) {
                 indexes[count] = i;
                 count++;
             }
         }
         indexes = shuffleInt(indexes);
         return indexes;
+    }
+
+    Actor[][] placement(Actor[][] world, Actor[] actors, int[] indexes) {
+        Actor[] worldArr = matrix2arr(world);
+        if (indexes.length < actors.length) {
+            out.println("YOU DUN FUCKED UP BOI");
+        }
+        for (int i = 0; i < actors.length; i++) {
+            worldArr[indexes[i]] = actors[i];
+        }
+        Actor[][] nWorld = arr2matrix(worldArr);
+        return nWorld;
     }
 
     // ----------- Utility methods -----------------
@@ -207,7 +231,7 @@ public class Neighbours extends Application {
         return arr;
     }
 
-    int[]shuffleInt(int[] arr) {
+    int[] shuffleInt(int[] arr) {
         Random rand = new Random();
         for (int i = arr.length - 1; i >= 0; i--) {
             int j = rand.nextInt(i + 1);
@@ -218,31 +242,39 @@ public class Neighbours extends Application {
         return arr;
     }
 
-    int countNull(Actor[][] world){
+    int countNull(Actor[][] world) {
         int nNull = 0;
         Actor[] arr = matrix2arr(world);
-        for(int i=0;i<arr.length;i++){
-            if(arr[i] == null){
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == null) {
                 nNull++;
             }
         }
         return nNull;
     }
 
-    /*Actor[] purgeNull(Actor[] arr){
+    int countActor(Actor[][] world) {
         int nNull = 0;
-        for(int i=0;i<arr.length;i++){
-            if(arr[i] == null){
+        Actor[] arr = matrix2arr(world);
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] != null) {
                 nNull++;
             }
         }
-        Actor[] nArr = new Actor[arr.length - nNull];
-        int k = 0;
-        for(int i=0;i<arr.length;i++){
+        return nNull;
+    }
 
+    Actor[][] purgeUnsatisfied(Actor[][] world, double threshold) {
+        for (int r = 0; r < world.length; r++) {
+            for (int c = 0; c < world.length; c++) {
+                if (!isSatisfied(world, world.length, r, c, threshold)) {
+                    world[r][c] = null;
+                }
+            }
         }
-        return nArr;
-    }*/
+
+        return world;
+    }
 
     // ------- Testing -------------------------------------
 
@@ -252,8 +284,8 @@ public class Neighbours extends Application {
         // A small hard coded world for testing
         Actor[][] testWorld = new Actor[][]{
                 {new Actor(Color.BLUE), new Actor(Color.RED), null},
-                {null,                  new Actor(Color.RED), null},
-                {new Actor(Color.BLUE), null,                   new Actor(Color.BLUE)}
+                {null, new Actor(Color.RED), null},
+                {new Actor(Color.BLUE), null, new Actor(Color.BLUE)}
         };
         double th = 0.5;   // Simple threshold used for testing
 
@@ -270,17 +302,31 @@ public class Neighbours extends Application {
         Actor[] testArr = matrix2arr(testWorld2);
         for (int i = 0; i < nLoc; i++) {
             if (testArr[i] != null) {
-                out.println(testArr[i].color);
+                //out.println(testArr[i].color);
             } else {
-                out.println("null");
+                //out.println("null");
             }
+        }
+        for(int i = 0;i<testWorld2.length;i++){
+            out.println(Arrays.toString(testWorld2[i]));
         }*/
 
-        //out.println((isSatisfied(testWorld, 9, 1, 0, th)==false));
-        //out.println((isSatisfied(testWorld, 9, 1, 1, 1.0)==false));
-        //out.println((isSatisfied(testWorld, 9, 2, 2, th)==true));
+        //out.println(countNull(testWorld));
+
+        out.println((isSatisfied(testWorld, 3, 1, 0, th) == true));
+        out.println((isSatisfied(testWorld, 3, 1, 1, 1.0) == false));
+        out.println((isSatisfied(testWorld, 3, 2, 2, th) == false));
         //out.println(Arrays.toString(unsatisfied(testWorld, th)));
-        out.println(Arrays.toString(emptySpaces(testWorld)));
+        //out.println(Arrays.toString(emptySpaces(testWorld)));
+        //out.println(Arrays.toString(purgeUnsatisfied(testWorld, th)[0]));
+        //out.println(Arrays.toString(purgeUnsatisfied(testWorld, th)[1]));
+        //out.println(Arrays.toString(purgeUnsatisfied(testWorld, th)[2]));
+
+        //Actor[] dude1 = new Actor[]{new Actor(Color.RED)/*, new Actor(Color.BLUE), new Actor(Color.RED)*/};
+        //int[] ind = new int[] {2,3};
+        //out.println(Arrays.toString(placement(testWorld, dude1, ind)[0]));
+        //out.println(Arrays.toString(placement(testWorld, dude1, ind)[1]));
+        //out.println(Arrays.toString(placement(testWorld, dude1, ind)[2]));
 
         exit(0);
     }
