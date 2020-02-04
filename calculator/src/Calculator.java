@@ -2,6 +2,7 @@ import java.util.*;
 
 import static java.lang.Double.NaN;
 import static java.lang.Math.pow;
+import static java.lang.System.*;
 
 
 /*
@@ -30,6 +31,8 @@ class Calculator {
 
     // Method used by all
     double eval(String expr) {
+        out.println(Arrays.toString(split(expr)));
+
         if (expr.length() == 0) {
             return NaN;
         }
@@ -64,10 +67,20 @@ class Calculator {
         throw new RuntimeException(OP_NOT_FOUND);
     }
 
-    // ------- Infix 2 Postfix ------------------------
 
+    // ------- Infix 2 Postfix ------------------------
     List<String> infix2Postfix(List<String> infix) {
         // TODO
+
+        List stack = new Stack();
+        List postfix = new ArrayList();
+
+        for (int n = 0; n < infix.size(); n++) {
+            if (OPERATORS.contains(infix.get(n)) || "()".contains(infix.get(n))) {
+                stack.add(infix.get(n));
+            }
+        }
+
         return null;
     }
 
@@ -106,6 +119,44 @@ class Calculator {
     List<String> tokenize(String expr) {
         // TODO
         return null;
+    }
+
+//    boolean contains(String thigny, String ex) {
+//        boolean yes = false;
+//        int offset = ex.length() - 1;
+//        for (int i = 0; i < thigny.length(); i++) {
+//            if (ex == thigny.substring(i, i + offset)) {
+//                yes = true;
+//            }
+//        }
+//        return yes;
+//    }
+//
+
+    List[] split(String expr) {
+
+        List Numbers = new ArrayList();
+        List operands = new Stack();
+        int count = 0;
+        int base = 0;
+        for (int i = 0; i < expr.length(); i++) {
+            if (OPERATORS.indexOf(expr.charAt(i)) != -1) {
+                if (expr.substring(base, count).length() != 0) {
+                    Numbers.add(expr.substring(base, count));
+                }
+                operands.add(expr.charAt(i));
+                count++;
+                base = count;
+            } else if (i == (expr.length() - 1)) {
+                count++;
+                Numbers.add(expr.substring(base, count));
+            } else {
+                count++;
+            }
+
+        }
+        List[] lists = new List[]{Numbers, operands};
+        return lists;
     }
 
 }
