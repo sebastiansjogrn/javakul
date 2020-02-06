@@ -31,13 +31,15 @@ class Calculator {
 
     // Method used by all
     double eval(String expr) {
-        out.println(Arrays.toString(split(expr)));
+        out.println((tokenize(expr)));
 
         if (expr.length() == 0) {
             return NaN;
         }
         List<String> tokens = tokenize(expr);
         List<String> postfix = infix2Postfix(tokens);
+        out.println(postfix);
+
         return evalPostfix(postfix);
     }
 
@@ -69,19 +71,32 @@ class Calculator {
 
 
     // ------- Infix 2 Postfix ------------------------
-    List<String> infix2Postfix(List<String> infix) {
+    List<String> infix2Postfix(List<String> infix) { //Fix not adding parenthesis and adding stack at the end?
         // TODO
 
-        List stack = new Stack();
+        List stack = new Stack();           //How does stack actchually wurk?
         List postfix = new ArrayList();
+        List tmp = new ArrayList();
 
         for (int n = 0; n < infix.size(); n++) {
-            if (OPERATORS.contains(infix.get(n)) || "()".contains(infix.get(n))) {
+            if (OPERATORS.contains(infix.get(n)) || "(".contains(infix.get(n))) {
                 stack.add(infix.get(n));
+            } else if (")".contains(infix.get(n))) {
+                for (int i = stack.size()-1; i >= 0; i--) {
+                    if (!"(".contains(infix.get(n))) {
+                        postfix.add(stack.get(i));
+                    } else {
+                        stack.remove(stack.size() - 1);
+                        break;
+                    }
+                    stack.remove(stack.size() - 1);
+                }
+            }else if (!"(".contains(infix.get(n))){
+                postfix.add(infix.get(n));
             }
-        }
 
-        return null;
+        }
+        return postfix;
     }
 
     // TODO More methods
@@ -118,7 +133,28 @@ class Calculator {
     // List String (not char) because numbers (with many chars)
     List<String> tokenize(String expr) {
         // TODO
-        return null;
+
+        List tokens = new ArrayList();
+        int count = 0;
+        int base = 0;
+        for (int i = 0; i < expr.length(); i++) {
+            if (OPERATORS.indexOf(expr.charAt(i)) != -1 || "()".indexOf(expr.charAt(i)) != -1) {
+                if (expr.substring(base, count).length() != 0) {
+                    tokens.add(expr.substring(base, count));
+                }
+                tokens.add(String.valueOf(expr.charAt(i)));
+                count++;
+                base = count;
+            } else if (i == (expr.length() - 1)) {
+                count++;
+                tokens.add(expr.substring(base, count));
+            } else {
+                count++;
+            }
+
+        }
+
+        return tokens;
     }
 
 //    boolean contains(String thigny, String ex) {
