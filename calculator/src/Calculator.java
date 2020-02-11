@@ -45,7 +45,7 @@ class Calculator {
 
     // ------  Evaluate RPN expression -------------------
 
-    double evalPostfix(List<String> postfix) { // fix 2^2+3 !=7 (now it's 32 (2^(2+3)))
+    double evalPostfix(List<String> postfix) { // (fix 2^2+3 !=7 (now it's 32 (2^(2+3)))) switch??
         // TODO
         double d1 = 0;
         double d2 = 0;
@@ -119,30 +119,64 @@ class Calculator {
     List<String> infix2Postfix(List<String> infix) {
         // TODO
 
-        List stack = new Stack();
+        Stack<String> stack = new Stack();
         List postfix = new ArrayList();
-        List tmp = new ArrayList();
+        String tmp;
 
         for (int n = 0; n < infix.size(); n++) {
-            if (OPERATORS.contains(infix.get(n)) || infix.get(n).equals("(")) {
-                stack.add(infix.get(n));
+            if (OPERATORS.contains(infix.get(n))) {
+                if(stack.size() != 0){
+                    if(OPERATORS.contains(stack.peek())){
+                        while(getPrecedence(stack.peek()) > getPrecedence(infix.get(n))
+                                || getPrecedence(stack.peek()) == getPrecedence(infix.get(n))
+                                && getAssociativity(stack.peek()) == Assoc.LEFT){
+
+                            popStack(stack, postfix);
+
+
+                        }
+                    }
+                }
+                stack.push(infix.get(n));
+                /*if ((getAssociativity(infix.get(n))) == Assoc.RIGHT) {
+                    postfix.add(infix.get(n + 1));
+                    postfix.add(infix.get(n));
+                    n++;
+                } else {
+                    stack.add(0, infix.get(n));
+                }*/
+            } else if (infix.get(n).equals("(")) {
+                stack.push(infix.get(n));
             } else if (infix.get(n).equals(")")) {
-                for (int i = stack.size() - 1; i >= 0; i--) {
-                    if (!(stack.get(i).equals("("))) {
-                        postfix.add(stack.get(i));
+                addParenthesis(stack, postfix);
+                /*for (int i = 0; i < stack.size(); i++) {
+                    if (!(stack.get(0).equals("("))) {
+                        postfix.add(stack.get(0));
                     } else {
-                        stack.remove(stack.size() - 1);
+                        stack.remove(0);
                         break;
                     }
-                    stack.remove(stack.size() - 1);
-                }
-            } else if (!(infix.get(n).equals("("))) {
+                    stack.remove(0);
+                }*/
+            } else/* if (!(infix.get(n).equals("("))) */ {
                 postfix.add(infix.get(n));
             }
         }
-        postfix.addAll(reverse(stack));
+        popStack(stack, postfix);
         return postfix;
     }
+
+//    while(there is an operator at the top of the operator stack with greater precedence)
+//    or (the operator at the top of the operator stack has equal precedence and the token is left associative))
+//    and (the operator at the top of the operator stack is not a left parenthesis):
+//    pop operators from the operator stack onto the output queue.
+//    push it onto the operator stack.
+
+   /* static void stack_peek(Stack<Integer> stack)
+    {
+        Integer element = (Integer) stack.peek();
+        System.out.println("Element on stack top : " + element);
+    }*/
 
     // TODO More methods
 
@@ -173,13 +207,31 @@ class Calculator {
         RIGHT
     }
 
-    List reverse(List ls) {
+    void addParenthesis(Stack<String> stack, List postfix) {
+        while (true) {
+            if (!(stack.peek().equals("("))) {
+                postfix.add(stack.pop());
+            } else {
+                stack.pop();
+                break;
+            }
+        }
+    }
+
+    void popStack(Stack<String> stack, List postfix){
+        int size = stack.size();
+        for(int i = 0;i<size;i++){
+            postfix.add(stack.pop());
+        }
+    }
+
+    /*List reverse(List ls) {
         List reversed = new ArrayList();
         for (int i = ls.size() - 1; i >= 0; i--) {
             reversed.add(ls.get(i));
         }
         return reversed;
-    }
+    }*/
 
     // ---------- Tokenize -----------------------
 
