@@ -45,10 +45,55 @@ class Calculator {
 
     // ------  Evaluate RPN expression -------------------
 
-    double evalPostfix(List<String> postfix) {
+    double evalPostfix(List<String> postfix) { // fix 2^2+3 !=7 (now it's 32 (2^(2+3)))
         // TODO
-        return 0;
+        double d1 = 0;
+        double d2 = 0;
+        double result;
+        int count = 0;
+        for (int n = 0; n < postfix.size(); n++) {
+            if (OPERATORS.contains(postfix.get(n))) {
+                if (postfix.get(n - 1) != null || postfix.get(n - 2) != null) {
+                    d1 = Double.parseDouble(postfix.get(n - 1));
+                    d2 = Double.parseDouble(postfix.get(n - 2));
+                    result = applyOperator(postfix.get(n), d1, d2);
+                    postfix.remove(n);
+                    postfix.remove(n - 1);
+                    postfix.remove(n - 2);
+                    postfix.add(n - 2, Double.toString(result));
+                    n -= 2;
+                }
+            }
+        }
+        result = Double.parseDouble(postfix.get(0));
+        return result;
     }
+
+//    double evalPostfix(List<String> postfix) {
+//        // TODO
+//        double k1 = 0;
+//        double k2 = 0;
+//        double result;
+//        int count = 0;
+//        for(int n=0;n<postfix.size();n++){
+//            if(OPERATORS.contains(postfix.get(n))){
+//                for(int i = n;i>=0;i--){
+//                    if(!OPERATORS.contains(postfix.get(i))){
+//                        if(count>0){
+//                            k2 = Double.parseDouble(postfix.get(i));
+//                            result = applyOperator(postfix.get(n),k1,k2);
+//                            postfix.add(i,Double.toString(result));
+//                        }
+//                        k1 = Double.parseDouble(postfix.get(i));
+//                        postfix.remove(i);
+//                        count ++;
+//                    }
+//                }
+//            }
+//        }
+//        out.println(postfix);
+//        return 0;
+//    }
 
     double applyOperator(String op, double d1, double d2) {
         switch (op) {
@@ -71,19 +116,19 @@ class Calculator {
 
 
     // ------- Infix 2 Postfix ------------------------
-    List<String> infix2Postfix(List<String> infix) { //Fix not adding parenthesis and adding stack at the end?
+    List<String> infix2Postfix(List<String> infix) {
         // TODO
 
-        List stack = new Stack();           //How does stack actchually wurk?
+        List stack = new Stack();
         List postfix = new ArrayList();
         List tmp = new ArrayList();
 
         for (int n = 0; n < infix.size(); n++) {
-            if (OPERATORS.contains(infix.get(n)) || "(".contains(infix.get(n))) {
+            if (OPERATORS.contains(infix.get(n)) || infix.get(n).equals("(")) {
                 stack.add(infix.get(n));
-            } else if (")".contains(infix.get(n))) {
-                for (int i = stack.size()-1; i >= 0; i--) {
-                    if (!"(".contains(infix.get(n))) {
+            } else if (infix.get(n).equals(")")) {
+                for (int i = stack.size() - 1; i >= 0; i--) {
+                    if (!(stack.get(i).equals("("))) {
                         postfix.add(stack.get(i));
                     } else {
                         stack.remove(stack.size() - 1);
@@ -91,11 +136,11 @@ class Calculator {
                     }
                     stack.remove(stack.size() - 1);
                 }
-            }else if (!"(".contains(infix.get(n))){
+            } else if (!(infix.get(n).equals("("))) {
                 postfix.add(infix.get(n));
             }
-
         }
+        postfix.addAll(reverse(stack));
         return postfix;
     }
 
@@ -128,6 +173,14 @@ class Calculator {
         RIGHT
     }
 
+    List reverse(List ls) {
+        List reversed = new ArrayList();
+        for (int i = ls.size() - 1; i >= 0; i--) {
+            reversed.add(ls.get(i));
+        }
+        return reversed;
+    }
+
     // ---------- Tokenize -----------------------
 
     // List String (not char) because numbers (with many chars)
@@ -157,19 +210,7 @@ class Calculator {
         return tokens;
     }
 
-//    boolean contains(String thigny, String ex) {
-//        boolean yes = false;
-//        int offset = ex.length() - 1;
-//        for (int i = 0; i < thigny.length(); i++) {
-//            if (ex == thigny.substring(i, i + offset)) {
-//                yes = true;
-//            }
-//        }
-//        return yes;
-//    }
-//
-
-    List[] split(String expr) {
+    /*List[] split(String expr) {
 
         List Numbers = new ArrayList();
         List operands = new Stack();
@@ -193,6 +234,6 @@ class Calculator {
         }
         List[] lists = new List[]{Numbers, operands};
         return lists;
-    }
+    }*/
 
 }
