@@ -45,7 +45,7 @@ class Calculator {
 
     // ------  Evaluate RPN expression -------------------
 
-    double evalPostfix(List<String> postfix) { // (fix 2^2+3 !=7 (now it's 32 (2^(2+3)))) switch??
+    double evalPostfix(List<String> postfix) { // runtime errors fix?
         // TODO
         double d1 = 0;
         double d2 = 0;
@@ -53,7 +53,10 @@ class Calculator {
         int count = 0;
         for (int n = 0; n < postfix.size(); n++) {
             if (OPERATORS.contains(postfix.get(n))) {
-                if (postfix.get(n - 1) != null || postfix.get(n - 2) != null) {
+                if (postfix.size() < 2) {
+                    throw new RuntimeException(MISSING_OPERAND);
+                }
+                if (postfix.get(n - 1) != null && postfix.get(n - 2) != null) {
                     d1 = Double.parseDouble(postfix.get(n - 1));
                     d2 = Double.parseDouble(postfix.get(n - 2));
                     result = applyOperator(postfix.get(n), d1, d2);
@@ -125,13 +128,17 @@ class Calculator {
 
         for (int n = 0; n < infix.size(); n++) {
             if (OPERATORS.contains(infix.get(n))) {
-                if(stack.size() != 0){
-                    if(OPERATORS.contains(stack.peek())){
-                        while(getPrecedence(stack.peek()) > getPrecedence(infix.get(n))
-                                || getPrecedence(stack.peek()) == getPrecedence(infix.get(n))
-                                && getAssociativity(stack.peek()) == Assoc.LEFT){
+                if (stack.size() != 0) {
+                    if (OPERATORS.contains(stack.peek())) {
+                        while ((getPrecedence(stack.peek()) > getPrecedence(infix.get(n))
+                                || (getPrecedence(stack.peek()) == getPrecedence(infix.get(n))
+                                && getAssociativity(stack.peek()) == Assoc.LEFT))) {
 
-                            popStack(stack, postfix);
+                            postfix.add(stack.pop());
+                            if (stack.size() == 0) {
+                                break;
+                            }
+                            //popStack(stack, postfix);
 
 
                         }
@@ -218,16 +225,16 @@ class Calculator {
         }
     }
 
-    void popStack(Stack<String> stack, List postfix){
+    void popStack(Stack<String> stack, List postfix) {
         int size = stack.size();
-        for(int i = 0;i<size;i++){
+        for (int i = 0; i < size; i++) {
             postfix.add(stack.pop());
         }
     }
 
     /*List reverse(List ls) {
         List reversed = new ArrayList();
-        for (int i = ls.size() - 1; i >= 0; i--) {
+        for (int i = ls.size() - 1; i >= 0; i--) {fix 2^2+3 !=7 (now it's 32 (2^(2+3)))) switch??
             reversed.add(ls.get(i));
         }
         return reversed;
@@ -239,26 +246,34 @@ class Calculator {
     List<String> tokenize(String expr) {
         // TODO
 
+        StringBuilder str = new StringBuilder(expr);
         List tokens = new ArrayList();
         int count = 0;
         int base = 0;
-        for (int i = 0; i < expr.length(); i++) {
-            if (OPERATORS.indexOf(expr.charAt(i)) != -1 || "()".indexOf(expr.charAt(i)) != -1) {
-                if (expr.substring(base, count).length() != 0) {
-                    tokens.add(expr.substring(base, count));
+
+        for (int i = 0; i < str.length(); i++) {
+            if (OPERATORS.indexOf(str.charAt(i)) != -1 || "()".indexOf(str.charAt(i)) != -1) {
+                if (str.substring(base, count).length() != 0) {
+                    tokens.add(str.substring(base, count));
                 }
-                tokens.add(String.valueOf(expr.charAt(i)));
+                tokens.add(String.valueOf(str.charAt(i)));
                 count++;
                 base = count;
-            } else if (i == (expr.length() - 1)) {
-                count++;
-                tokens.add(expr.substring(base, count));
+            } else if (i == (str.length() - 1)) {
+                if (str.charAt(i) != (' ')) {
+                    count++;
+                    tokens.add(str.substring(base, count));
+                } else if (str.substring(base, count).length() != 0) {
+                    tokens.add(str.substring(base, count));
+                }
+            } else if (str.charAt(i) == (' ')) {
+                str.deleteCharAt(i);
+                i--;
             } else {
                 count++;
             }
 
         }
-
         return tokens;
     }
 
