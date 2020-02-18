@@ -52,11 +52,11 @@ class Calculator {
         double result;
         int count = 0;
         for (int n = 0; n < postfix.size(); n++) {
-            if (OPERATORS.contains(postfix.get(n))) {
-                if (postfix.size() < 2) {
+//            if (OPERATORS.contains(postfix.get(n))) {
+                /*if (postfix.size() < 2) {
                     throw new RuntimeException(MISSING_OPERAND);
-                }
-                if (postfix.get(n - 1) != null && postfix.get(n - 2) != null) {
+                }*/
+                if (postfix.size() > 2) {
                     d1 = Double.parseDouble(postfix.get(n - 1));
                     d2 = Double.parseDouble(postfix.get(n - 2));
                     result = applyOperator(postfix.get(n), d1, d2);
@@ -65,8 +65,12 @@ class Calculator {
                     postfix.remove(n - 2);
                     postfix.add(n - 2, Double.toString(result));
                     n -= 2;
+                } else if (OPERATORS.contains(postfix.get(n))) {
+                    throw new IllegalArgumentException(MISSING_OPERAND);
+                } else {
+                    throw new IllegalArgumentException(MISSING_OPERATOR);
                 }
-            }
+//            }
         }
         result = Double.parseDouble(postfix.get(0));
         return result;
@@ -225,20 +229,27 @@ class Calculator {
         }
     }
 
+//    void addParenthesis(Stack<String> stack, List postfix) {
+//        while (stack.size() != 0) {
+//            if (!(stack.peek().equals("("))) {
+//                postfix.add(stack.pop());
+//                break;
+//            } else if (stack.peek().equals("(")) {
+//                stack.pop();
+//                break;
+//            } else {
+//                stack.pop();
+//                throw new IllegalArgumentException(MISSING_OPERATOR);
+//            }
+//        }
+//    }
+//
     void popStack(Stack<String> stack, List postfix) {
         int size = stack.size();
         for (int i = 0; i < size; i++) {
             postfix.add(stack.pop());
         }
     }
-
-    /*List reverse(List ls) {
-        List reversed = new ArrayList();
-        for (int i = ls.size() - 1; i >= 0; i--) {fix 2^2+3 !=7 (now it's 32 (2^(2+3)))) switch??
-            reversed.add(ls.get(i));
-        }
-        return reversed;
-    }*/
 
     // ---------- Tokenize -----------------------
 
@@ -248,59 +259,30 @@ class Calculator {
 
         StringBuilder str = new StringBuilder(expr);
         List tokens = new ArrayList();
-        int count = 0;
-        int base = 0;
 
         for (int i = 0; i < str.length(); i++) {
-            if (OPERATORS.indexOf(str.charAt(i)) != -1 || "()".indexOf(str.charAt(i)) != -1) {
-                if (str.substring(base, count).length() != 0) {
-                    tokens.add(str.substring(base, count));
+            if (str.charAt(i) != ' ') {
+                if (Character.isDigit(str.charAt(i))) {
+                    i = WholeNum(str, i, tokens);
+                } else {
+                    tokens.add(String.valueOf(str.charAt(i)));
                 }
-                tokens.add(String.valueOf(str.charAt(i)));
-                count++;
-                base = count;
-            } else if (i == (str.length() - 1)) {
-                if (str.charAt(i) != (' ')) {
-                    count++;
-                    tokens.add(str.substring(base, count));
-                } else if (str.substring(base, count).length() != 0) {
-                    tokens.add(str.substring(base, count));
-                }
-            } else if (str.charAt(i) == (' ')) {
-                str.deleteCharAt(i);
-                i--;
-            } else {
-                count++;
             }
-
         }
         return tokens;
     }
 
-    /*List[] split(String expr) {
-
-        List Numbers = new ArrayList();
-        List operands = new Stack();
-        int count = 0;
-        int base = 0;
-        for (int i = 0; i < expr.length(); i++) {
-            if (OPERATORS.indexOf(expr.charAt(i)) != -1) {
-                if (expr.substring(base, count).length() != 0) {
-                    Numbers.add(expr.substring(base, count));
-                }
-                operands.add(expr.charAt(i));
-                count++;
-                base = count;
-            } else if (i == (expr.length() - 1)) {
-                count++;
-                Numbers.add(expr.substring(base, count));
+    int WholeNum(StringBuilder str, int i, List tokens) {
+        StringBuilder newStr = new StringBuilder();
+        while (i < str.length()) {
+            if (Character.isDigit(str.charAt(i))) {
+                newStr.append(str.charAt(i));
             } else {
-                count++;
+                break;
             }
-
+            i++;
         }
-        List[] lists = new List[]{Numbers, operands};
-        return lists;
-    }*/
-
+        tokens.add(newStr.toString());
+        return --i;
+    }
 }

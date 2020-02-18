@@ -44,8 +44,8 @@ class Test {
 //        i2p("20/4/2", "20 4 / 2 /");
 //        i2p("4^3^2", "4 3 2 ^ ^");
 //        i2p("4^3*2", "4 3 ^ 2 *");
-//        i2p("(1+2)*3", "1 2 + 3 *");
-//        i2p("2^(1+1)", "2 1 1 + ^");
+        i2p("(1+2)*3", "1 2 + 3 *");
+        i2p("2^(1+1)", "2 1 1 + ^");
 
         // Evaluation ------------------------------
         // A value
@@ -96,21 +96,21 @@ class Test {
 //        } catch (IllegalArgumentException e) {
 //            out.println(e.getMessage().equals(Calculator.DIV_BY_ZERO));
 //        }
-        try {
-            e("1 + 2 + ", 0);
-        } catch (IllegalArgumentException e) {
-            out.println(e.getMessage().equals(Calculator.MISSING_OPERAND));
-        }
-        try {
-            e("12 3", 0);
-        } catch (IllegalArgumentException e) {
-            out.println(e.getMessage().equals(Calculator.MISSING_OPERATOR));
-        }
-        try {
-            e("1 + 2)", 0);
-        } catch (IllegalArgumentException e) {
-            out.println(e.getMessage().equals(Calculator.MISSING_OPERATOR));
-        }
+//        try {
+//            e("1 + 2 + ", 0);
+//        } catch (IllegalArgumentException e) {
+//            out.println(e.getMessage().equals(Calculator.MISSING_OPERAND));
+//        }
+//        try {
+//            e("12 3", 0);
+//        } catch (IllegalArgumentException e) {
+//            out.println(e.getMessage().equals(Calculator.MISSING_OPERATOR));
+//        }
+//        try {
+//            e("1 + 2)", 0);
+//        } catch (IllegalArgumentException e) {
+//            out.println(e.getMessage().equals(Calculator.MISSING_OPERATOR));
+//        }
 
 
         // Optional, try to fix this
