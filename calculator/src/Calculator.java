@@ -31,31 +31,27 @@ class Calculator {
 
     // Method used by all
     double eval(String expr) {
-        out.println((tokenize(expr)));
+//        out.println((tokenize(expr)));    //Print of tokenize to see what it does
 
         if (expr.length() == 0) {
             return NaN;
         }
         List<String> tokens = tokenize(expr);
         List<String> postfix = infix2Postfix(tokens);
-        out.println(postfix);
+//        out.println(postfix);             //Print after infix2Postfix to see what it does
 
         return evalPostfix(postfix);
     }
 
     // ------  Evaluate RPN expression -------------------
 
-    double evalPostfix(List<String> postfix) { // runtime errors fix?
+    double evalPostfix(List<String> postfix) {
         // TODO
-        double d1 = 0;
-        double d2 = 0;
+        double d1;
+        double d2;
         double result;
-        int count = 0;
         for (int n = 0; n < postfix.size(); n++) {
-//            if (OPERATORS.contains(postfix.get(n))) {
-                /*if (postfix.size() < 2) {
-                    throw new RuntimeException(MISSING_OPERAND);
-                }*/
+            if (OPERATORS.contains(postfix.get(n))) {
                 if (postfix.size() > 2) {
                     d1 = Double.parseDouble(postfix.get(n - 1));
                     d2 = Double.parseDouble(postfix.get(n - 2));
@@ -65,42 +61,20 @@ class Calculator {
                     postfix.remove(n - 2);
                     postfix.add(n - 2, Double.toString(result));
                     n -= 2;
-                } else if (OPERATORS.contains(postfix.get(n))) {
+                } else{
+                    throw new IllegalArgumentException(MISSING_OPERAND);
+                }
+            } else if (postfix.size() == 2) {
+                if (OPERATORS.contains(postfix.get(postfix.size() - 1))) {
                     throw new IllegalArgumentException(MISSING_OPERAND);
                 } else {
                     throw new IllegalArgumentException(MISSING_OPERATOR);
                 }
-//            }
+            }
         }
         result = Double.parseDouble(postfix.get(0));
         return result;
     }
-
-//    double evalPostfix(List<String> postfix) {
-//        // TODO
-//        double k1 = 0;
-//        double k2 = 0;
-//        double result;
-//        int count = 0;
-//        for(int n=0;n<postfix.size();n++){
-//            if(OPERATORS.contains(postfix.get(n))){
-//                for(int i = n;i>=0;i--){
-//                    if(!OPERATORS.contains(postfix.get(i))){
-//                        if(count>0){
-//                            k2 = Double.parseDouble(postfix.get(i));
-//                            result = applyOperator(postfix.get(n),k1,k2);
-//                            postfix.add(i,Double.toString(result));
-//                        }
-//                        k1 = Double.parseDouble(postfix.get(i));
-//                        postfix.remove(i);
-//                        count ++;
-//                    }
-//                }
-//            }
-//        }
-//        out.println(postfix);
-//        return 0;
-//    }
 
     double applyOperator(String op, double d1, double d2) {
         switch (op) {
@@ -128,48 +102,20 @@ class Calculator {
 
         Stack<String> stack = new Stack();
         List postfix = new ArrayList();
-        String tmp;
 
         for (int n = 0; n < infix.size(); n++) {
             if (OPERATORS.contains(infix.get(n))) {
                 if (stack.size() != 0) {
                     if (OPERATORS.contains(stack.peek())) {
-                        while ((getPrecedence(stack.peek()) > getPrecedence(infix.get(n))
-                                || (getPrecedence(stack.peek()) == getPrecedence(infix.get(n))
-                                && getAssociativity(stack.peek()) == Assoc.LEFT))) {
-
-                            postfix.add(stack.pop());
-                            if (stack.size() == 0) {
-                                break;
-                            }
-                            //popStack(stack, postfix);
-
-
-                        }
+                        popOp(postfix, stack, infix.get(n));
                     }
                 }
                 stack.push(infix.get(n));
-                /*if ((getAssociativity(infix.get(n))) == Assoc.RIGHT) {
-                    postfix.add(infix.get(n + 1));
-                    postfix.add(infix.get(n));
-                    n++;
-                } else {
-                    stack.add(0, infix.get(n));
-                }*/
             } else if (infix.get(n).equals("(")) {
                 stack.push(infix.get(n));
             } else if (infix.get(n).equals(")")) {
                 addParenthesis(stack, postfix);
-                /*for (int i = 0; i < stack.size(); i++) {
-                    if (!(stack.get(0).equals("("))) {
-                        postfix.add(stack.get(0));
-                    } else {
-                        stack.remove(0);
-                        break;
-                    }
-                    stack.remove(0);
-                }*/
-            } else/* if (!(infix.get(n).equals("("))) */ {
+            } else{
                 postfix.add(infix.get(n));
             }
         }
@@ -177,17 +123,20 @@ class Calculator {
         return postfix;
     }
 
-//    while(there is an operator at the top of the operator stack with greater precedence)
-//    or (the operator at the top of the operator stack has equal precedence and the token is left associative))
-//    and (the operator at the top of the operator stack is not a left parenthesis):
-//    pop operators from the operator stack onto the output queue.
-//    push it onto the operator stack.
+    void popOp(List postfix, Stack<String> stack, String op){
+        while (toPopOrNotToPop(stack, op)) {
+            postfix.add(stack.pop());
+            if (stack.size() == 0) {
+                break;
+            }
+        }
+    }
 
-   /* static void stack_peek(Stack<Integer> stack)
-    {
-        Integer element = (Integer) stack.peek();
-        System.out.println("Element on stack top : " + element);
-    }*/
+    boolean toPopOrNotToPop(Stack<String> stack, String op){
+        return ((getPrecedence(stack.peek()) > getPrecedence(op)
+            || (getPrecedence(stack.peek()) == getPrecedence(op)
+            && getAssociativity(stack.peek()) == Assoc.LEFT)));
+    }
 
     // TODO More methods
 
@@ -220,6 +169,11 @@ class Calculator {
 
     void addParenthesis(Stack<String> stack, List postfix) {
         while (true) {
+            if (stack.size() == 1) {
+                if ((!stack.peek().equals("("))) {
+                    throw new IllegalArgumentException(MISSING_OPERATOR);
+                }
+            }
             if (!(stack.peek().equals("("))) {
                 postfix.add(stack.pop());
             } else {
@@ -229,21 +183,6 @@ class Calculator {
         }
     }
 
-//    void addParenthesis(Stack<String> stack, List postfix) {
-//        while (stack.size() != 0) {
-//            if (!(stack.peek().equals("("))) {
-//                postfix.add(stack.pop());
-//                break;
-//            } else if (stack.peek().equals("(")) {
-//                stack.pop();
-//                break;
-//            } else {
-//                stack.pop();
-//                throw new IllegalArgumentException(MISSING_OPERATOR);
-//            }
-//        }
-//    }
-//
     void popStack(Stack<String> stack, List postfix) {
         int size = stack.size();
         for (int i = 0; i < size; i++) {
