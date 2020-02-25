@@ -22,7 +22,7 @@ public class Ex1TestRational {
     private void test() {
         // As usual, all output should print true
 
-        /*Rational r = new Rational(2);
+        Rational r = new Rational(2);
         out.println(r.getNum() == 2 && r.getDenom() == 1);
         r = new Rational(4, 9);
         out.println(r.getNum() == 4 && r.getDenom() == 9);
@@ -37,19 +37,19 @@ public class Ex1TestRational {
         r = new Rational(49, -168);
         out.println(r.getNum() == -7 && r.getDenom() == 24);
         r = new Rational(-49, -168);
-        out.println(r.getNum() == 7 && r.getDenom() == 24);*/
+        out.println(r.getNum() == 7 && r.getDenom() == 24);
 
         Rational r1 = new Rational(1, 4);
         Rational r2 = new Rational(1, 2);
-        /*out.println(r1.add(r2).equals(new Rational(3, 4)));
+        out.println(r1.add(r2).equals(new Rational(3, 4)));
         out.println(r1.sub(r2).equals(new Rational(-1, 4)));
         out.println(r1.mul(r2).equals(new Rational(1, 8)));
-        out.println(r1.div(r2).equals(new Rational(1, 2)));*/
+        out.println(r1.div(r2).equals(new Rational(1, 2)));
 
         Rational r3 = new Rational(r1);
         out.println(r3.equals(r1));
         out.println(!r3.lessThan(r1));
-        //out.println(abs(r3.toDouble() - 0.25) < 0.000001);
+        out.println(abs(r3.toDouble() - 0.25) < 0.000001);
 
         List<Rational> rList = new ArrayList<>();
         rList.add(new Rational(2, 3));

@@ -1,0 +1,39 @@
+public interface IX {
+        void doIt();
+    }
+
+    public interface IY {
+        void doOther();
+    }
+
+    public class A {
+        public void doIt(double d) {
+            System.out.println("Doit A " + d);
+        }
+    }
+
+    public class B extends A implements IX {
+        public void doIt() {
+            System.out.println("Doit B");
+        }
+
+        public void doIt(int i) {
+            System.out.println("Doit B " + i);
+        }
+    }
+
+    public class C extends A implements IY {
+        public void doIt() {
+            System.out.println("Doit C");
+        }
+
+        public void doOther() {
+            System.out.println("DoOther " + this.getClass().getSimpleName());
+        }
+    }
+
+    public class D extends C {
+        public void doIt() {
+            System.out.println("Doit D");
+        }
+    }
