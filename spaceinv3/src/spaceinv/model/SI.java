@@ -28,7 +28,7 @@ public class SI {
     public static final int SHIP_MAX_DY = 0;
     public static final int GUN_WIDTH = 20;
     public static final int GUN_HEIGHT = 20;
-    public static final double GUN_MAX_DX = 2;
+    public static final double GUN_MAX_DX = 3;
     public static final double PROJECTILE_WIDTH = 5;
     public static final double PROJECTILE_HEIGHT = 5;
     public static final int GROUND_HEIGHT = 20;
@@ -41,13 +41,16 @@ public class SI {
     private static final Random rand = new Random();
 
     // TODO More references here
-    private final Gun gun = new Gun();
+    private final Gun gun;
 
     private final List<Projectile> shipBombs = new ArrayList<>();
     private Projectile gunProjectile;
     private int points;
 
     // TODO Constructor here
+    public SI(Gun gun) {
+        this.gun = gun;
+    }
 
 
     // Timing. All timing handled here!
@@ -67,10 +70,20 @@ public class SI {
              Movement
          */
 
+        List<Positionable> ps = getPositionables();
+//        gun.move(); //CONSTANT MOVEMENT?!?!?!
+//        gunProjectile.move();
+        for(Positionable p: ps){
+//             p.move();               //Make movable Interface?
+        }
+
         /*
             Ships fire
          */
-
+        /*Projectile gunPro = (Projectile) ps.get(1);
+        if(gunPro != null) {
+            gunPro.move();
+        }*/
 
         /*
              Collisions
@@ -93,12 +106,15 @@ public class SI {
 
     public void fireGun() {
         // TODO
+        gunProjectile = gun.fire();
     }
 
     // TODO More methods called by GUI
 
     public List<Positionable> getPositionables() {
         List<Positionable> ps = new ArrayList<>();
+        ps.add(gun);
+//        ps.add(gunProjectile);
         return ps;
     }
 
@@ -106,11 +122,17 @@ public class SI {
         return points;
     }
 
-    public SI() {
-//        this.gunProjectile = gunProjectile;
-//        this.points = points;
-//        this.lastTimeForMove = lastTimeForMove;
-//        this.lastTimeForFire = lastTimeForFire;
-//        this.shipToMove = shipToMove;
+    public Gun getGun() {
+        return gun;
+    }
+
+    public void accelerateGun(double d) {
+        if (Math.abs(gun.getDx()) != GUN_MAX_DX+d) {
+            gun.setDx(gun.getDx() + d);
+        }
+    }
+
+    public void moveGun(double d){
+        gun.setDx(d);
     }
 }

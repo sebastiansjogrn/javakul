@@ -52,9 +52,11 @@ public class SIGUI extends Application implements EventHandler {
         switch (kc) {
             case LEFT:
                // TODO
+                spaceInv.moveGun(-1);
                 break;
             case RIGHT:
                // TODO
+                spaceInv.moveGun(1);
                 break;
             case SPACE:
                 spaceInv.fireGun();
@@ -119,8 +121,8 @@ public class SIGUI extends Application implements EventHandler {
         // TODO Build model
 
         // NOTE: Declared at top of class
-        SI gj = new SI();
-        Gun gun = new Gun();
+        Gun gun = new Gun(249, 450/*, 50, 50*/);
+        spaceInv  = new SI(gun);
 
         renderBackground();
         timer.start();

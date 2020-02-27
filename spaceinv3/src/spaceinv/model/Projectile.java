@@ -8,7 +8,7 @@ import static spaceinv.model.SI.PROJECTILE_WIDTH;
 
        This class should later be refactored (and inherit most of what it needs)
  */
-public class Projectile  {
+public class Projectile implements Positionable {
 
 
     private double x;

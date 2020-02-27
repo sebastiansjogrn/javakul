@@ -32,7 +32,7 @@ See spaceinvader.png (for a class diagram)
 - SI representing the over all game. Class contains the main "game loop" (the update()
  method). The method is called by a timer, so no explicit loop needed.
 - SI have references to ships, projectiles, the gun, etc.
-- Ground and OtterSpace are used as collision detectors for projectiles. If hit
+- Ground and OuterSpace are used as collision detectors for projectiles. If hit
  ground/outerSpace the projectile will be removed (has left the game).
 - SI also holds a number of game-global constants and "administrative" variables.
 - Shooter is a utility class used by all that may shoot (avoid duplicate code)
