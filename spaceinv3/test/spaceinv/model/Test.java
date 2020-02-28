@@ -21,7 +21,7 @@ public class Test {
     void testGun(){
         // Create object
         Gun g = new Gun(0, 0);
-        SI si = new SI(g);
+//        SI si = new SI(g);
 
         // .. then call methods
         //out.println( g.doSomething() == true);

@@ -7,23 +7,14 @@ import static spaceinv.model.SI.*;
  *    A Gun for the game
  *    Can only fire one projectile at the time
  */
-public class Gun implements Positionable, Shootable{
+public class Gun extends AbstractMove implements Shootable {
 
-    double x;
-    double y;
-    double width;
-    double heigth;
-    double dx;
-
-    public Gun(double x, double y){
+    public Gun(double x, double y) {
         this(x, y, GUN_WIDTH, GUN_HEIGHT);
     }
 
-    public Gun(double x, double y, double width, double heigth) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.heigth = heigth;
+    public Gun(double x, double y, double width, double height) {
+        super(x, y, width, height, 0, 0);
     }
 
     @Override
@@ -31,39 +22,9 @@ public class Gun implements Positionable, Shootable{
         return Shooter.fire(this, 1);
     }
 
+    @Override
     public void move() {
-        x += dx;
-    }
-
-    @Override
-    public double getX() {
-        return x;
-    }
-
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    @Override
-    public double getY() {
-        return y;
-    }
-
-    @Override
-    public double getWidth() {
-        return width;
-    }
-
-    @Override
-    public double getHeight() {
-        return heigth;
-    }
-
-    public double getDx() {
-        return dx;
-    }
-
-    public void setDx(double dx) {
-        this.dx = dx;
+        this.setX(this.getX()+this.getDx());
+        this.setY(this.getY()+this.getDy());
     }
 }

@@ -145,7 +145,7 @@ This is a suggested workflow ...
 
 6.  Start out with spaceships, Implement class BattleCruiser. It's should be
     possible to inherit most of what's needed from the abstract base classes created.
-    Try to make it show up and them to move.
+    Try to make it show up and then to move.
 
 7.  Implement other space ships, Bomber and Frigate.
 

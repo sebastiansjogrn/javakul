@@ -52,11 +52,17 @@ public class SIGUI extends Application implements EventHandler {
         switch (kc) {
             case LEFT:
                // TODO
-                spaceInv.moveGun(-1);
+                spaceInv.moveGun(-GUN_MAX_DX, 0);
                 break;
             case RIGHT:
                // TODO
-                spaceInv.moveGun(1);
+                spaceInv.moveGun(GUN_MAX_DX, 0);
+                break;
+            case UP:
+                spaceInv.moveGun(0, -GUN_MAX_DX);
+                break;
+            case DOWN:
+                spaceInv.moveGun(0, GUN_MAX_DX);
                 break;
             case SPACE:
                 spaceInv.fireGun();
@@ -72,9 +78,18 @@ public class SIGUI extends Application implements EventHandler {
         KeyCode kc = event.getCode();
         switch (kc) {
             case LEFT:
-            case RIGHT:
-                // TODO
+                spaceInv.moveGun(0, 0);
                 break;
+            case RIGHT:
+                spaceInv.moveGun(0, 0);
+                break;
+            case UP:
+                spaceInv.moveGun(0,0);
+                break;
+            case DOWN:
+                spaceInv.moveGun(0,0);
+                break;
+                // TODO
             default: // Nothing
         }
     }
@@ -104,16 +119,16 @@ public class SIGUI extends Application implements EventHandler {
 
     private void newGame() {
 
-        /* Use later
+        /* Use later*/
         List<AbstractSpaceship> ships = new ArrayList<>();
         int nShips = 12 * (SHIP_WIDTH + 10);
-        for (int i = LEFT_LIMIT + 1; i < nShips; i += 30) {
+        /*for (int i = LEFT_LIMIT + 1; i < nShips; i += 30) {
             ships.add(new Frigate(i, 50));
-        }
+        }*/
         for (int i = LEFT_LIMIT + 1; i < nShips; i += 30) {
             ships.add(new BattleCruiser(i, 80));
         }
-        for (int i = LEFT_LIMIT + 1; i < nShips; i += 30) {
+        /*for (int i = LEFT_LIMIT + 1; i < nShips; i += 30) {
             ships.add(new Bomber(i, 110));
         }
         */
@@ -121,8 +136,8 @@ public class SIGUI extends Application implements EventHandler {
         // TODO Build model
 
         // NOTE: Declared at top of class
-        Gun gun = new Gun(249, 450/*, 50, 50*/);
-        spaceInv  = new SI(gun);
+        Gun gun = new Gun(GAME_WIDTH/2, GAME_HEIGHT-GROUND_HEIGHT);
+        spaceInv  = new SI(gun, ships);
 
         renderBackground();
         timer.start();

@@ -1,8 +1,10 @@
 package spaceinv.model;
 
 
+import javafx.geometry.Pos;
 import spaceinv.event.EventBus;
 import spaceinv.event.ModelEvent;
+import spaceinv.model.ships.BattleCruiser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,14 +44,17 @@ public class SI {
 
     // TODO More references here
     private final Gun gun;
+    private List<AbstractSpaceship> ships;
 
     private final List<Projectile> shipBombs = new ArrayList<>();
     private Projectile gunProjectile;
     private int points;
 
     // TODO Constructor here
-    public SI(Gun gun) {
+    public SI(Gun gun, List<AbstractSpaceship> ships) {
         this.gun = gun;
+        this.ships = ships;
+
     }
 
 
@@ -71,33 +76,40 @@ public class SI {
          */
 
         List<Positionable> ps = getPositionables();
-//        gun.move(); //CONSTANT MOVEMENT?!?!?!
-//        gunProjectile.move();
-        for(Positionable p: ps){
-//             p.move();               //Make movable Interface?
+        List<Movable> ms = getMovables(ps);
+
+        for (Movable m : ms) {
+            m.move();
         }
 
         /*
             Ships fire
          */
-        /*Projectile gunPro = (Projectile) ps.get(1);
-        if(gunPro != null) {
-            gunPro.move();
-        }*/
+
 
         /*
              Collisions
          */
-
+        boolean collision = false;
+        for(AbstractSpaceship s: ships){
+            collision = collision || shipHitLeftLimit(s) || shipHitRightLimit(s);
+        }
+                                                                                //Make the ships move yo!
     }
 
-    private boolean shipHitRightLimit() {
+    private boolean shipHitRightLimit(AbstractMove m) {
         // TODO
+        if (m.getX() >= RIGHT_LIMIT) {
+            return true;
+        }
         return false;
     }
 
-    private boolean shipHitLeftLimit() {
+    private boolean shipHitLeftLimit(AbstractMove m) {
         // TODO
+        if (m.getX() <= LEFT_LIMIT) {
+            return true;
+        }
         return false;
     }
 
@@ -106,7 +118,11 @@ public class SI {
 
     public void fireGun() {
         // TODO
-        gunProjectile = gun.fire();
+        if (gunProjectile == null) {
+            gunProjectile = gun.fire();
+        } else if (gunProjectile.getY() < OUTER_SPACE_HEIGHT) {
+            gunProjectile = gun.fire();
+        }
     }
 
     // TODO More methods called by GUI
@@ -114,15 +130,30 @@ public class SI {
     public List<Positionable> getPositionables() {
         List<Positionable> ps = new ArrayList<>();
         ps.add(gun);
-//        ps.add(gunProjectile);
+        if (gunProjectile != null) {
+            ps.add(gunProjectile);
+        }
+        ps.addAll(ships);
         return ps;
     }
+
+    List<Movable> getMovables(List<Positionable> ps) {
+        List<Movable> ms = new ArrayList<>();
+        for (Positionable p : ps) {
+            if (p instanceof Movable) {
+                ms.add((Movable) p);
+            }
+        }
+        return ms;
+    }
+
+
 
     public int getPoints() {
         return points;
     }
 
-    public Gun getGun() {
+/*    public Gun getGun() {
         return gun;
     }
 
@@ -130,9 +161,10 @@ public class SI {
         if (Math.abs(gun.getDx()) != GUN_MAX_DX+d) {
             gun.setDx(gun.getDx() + d);
         }
-    }
+    }*/
 
-    public void moveGun(double d){
-        gun.setDx(d);
+    public void moveGun(double dx, double dy) {
+        gun.setDx(dx);
+        gun.setDy(dy);
     }
 }
