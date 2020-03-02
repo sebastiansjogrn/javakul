@@ -13,7 +13,7 @@ public class BattleCruiser extends AbstractSpaceship {
     public static final int BATTLE_CRUISER_POINTS = 100;
 
     public BattleCruiser(double x, double y){
-        super(x, y, SI.SHIP_WIDTH, SI.SHIP_HEIGHT, 0, 0);
+        super(x, y, SI.SHIP_WIDTH, SI.SHIP_HEIGHT, SI.SHIP_MAX_DX, 0);
     }
 
     /*public BattleCruiser(double x, double y, double width, double height, double dx, double dy) {

@@ -8,10 +8,11 @@ public abstract class AbstractMove extends AbstractPosition implements Movable{
     public void move() {
         this.setX(this.getX()+this.getDx());
         this.setY(this.getY()+this.getDy());
+        this.setDy(0);
     }
 
-    public AbstractMove(double x, double y, double width, double heigth, double dx, double dy) {
-        super(x, y, width, heigth);
+    public AbstractMove(double x, double y, double width, double height, double dx, double dy) {
+        super(x, y, width, height);
         this.setDx(dx);
         this.setDy(dy);
     }

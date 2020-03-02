@@ -19,7 +19,7 @@ public class Gun extends AbstractMove implements Shootable {
 
     @Override
     public Projectile fire() {
-        return Shooter.fire(this, 1);
+        return Shooter.fire(this, PROJECTILE_SPEED);
     }
 
     @Override
