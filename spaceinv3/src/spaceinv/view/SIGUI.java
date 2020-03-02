@@ -178,10 +178,14 @@ public class SIGUI extends Application implements EventHandler {
                 break;
             case BOMB_HIT_GROUND:
                 // TODO Optional
-                break;
-            case BOMB_HIT_GUN:
                 p = (Positionable) evt.data;
                 new Explosion(p.getX(), p.getY(), fg).start();
+                break;
+            case BOMB_HIT_GUN:
+//                p = (Positionable) evt.data;
+//                new Explosion(p.getX(), p.getY(), fg).start();
+                timer.stop();
+                running = false;
                 break;
             case HAS_WON:
                 timer.stop();

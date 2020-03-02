@@ -5,6 +5,8 @@ import javafx.geometry.Pos;
 import spaceinv.event.EventBus;
 import spaceinv.event.ModelEvent;
 import spaceinv.model.ships.BattleCruiser;
+import spaceinv.model.ships.Bomber;
+import spaceinv.model.ships.Frigate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,14 +24,16 @@ public class SI {
     // Default values (not to use directly). Make program adaptable
     // by letting other programmers set values if they wish.
     // If not, set default values (as a service)
+    public static final int DIFFICULTY = 32;
     public static final int GAME_WIDTH = 500;
     public static final int GAME_HEIGHT = 500;
     public static final int LEFT_LIMIT = 50;
     public static final int RIGHT_LIMIT = 450;
     public static final int SHIP_WIDTH = 20;
     public static final int SHIP_HEIGHT = 20;
-    public static final int SHIP_MAX_DX = 2;
-    public static final int SHIP_MAX_DY = 2;
+    public static final int SHIP_MAX_DX = 3;
+    public static final int SHIP_MIN_DX = 1;
+    public static final int SHIP_MAX_DY = 20;
     public static final int GUN_WIDTH = 20;
     public static final int GUN_HEIGHT = 20;
     public static final double GUN_MAX_DX = 3;
@@ -48,6 +52,12 @@ public class SI {
     private static final Random rand = new Random();
 
     // TODO More references here
+
+                                            //Ships speed?
+                                            //Music!!
+                                            //Acceleration for gun
+
+
     private final Gun gun;
     private List<AbstractSpaceship> ships;
 
@@ -73,9 +83,9 @@ public class SI {
     public void update(long now) {
         time++;
 
-        /*if( ships.size() == 0){
+        if (ships.size() == 0) {
             EventBus.INSTANCE.publish(new ModelEvent(ModelEvent.Type.HAS_WON));
-        }*/
+        }
 
         /*
              Movement
@@ -87,6 +97,7 @@ public class SI {
         for (Movable m : ms) {
             m.move();
         }
+
 
         /*
             Ships fire
@@ -111,14 +122,23 @@ public class SI {
             }
         }
 
-//        List<Projectile> ls = getProjectiles(ms);
-        /*if(ls.size() > 0) {
-            projectilesCollision(ls, ps);
-        }*/
-        if(gunProjectile != null && ships.size() > 0 && shipBombs.size() > 0) {
-            projectilesCollision();
+        for (AbstractSpaceship s : ships) {
+            if (hitBorder(s)) {
+                EventBus.INSTANCE.publish(new ModelEvent(ModelEvent.Type.BOMB_HIT_GUN, gun));
+            }
         }
 
+        if (gunProjectile != null && ships.size() > 0 && shipBombs.size() > 0) {
+            List<Positionable> enemies = new ArrayList<>();
+            enemies.addAll(ships);
+            enemies.addAll(shipBombs);
+            projectilesCollision(enemies, gunProjectile);
+        }
+
+        if (shipBombs.size() > 0) {
+            List<Positionable> bombs = new ArrayList<>(shipBombs);
+            projectilesCollision(bombs, gun);
+        }
     }
 
     private boolean shipHitRightLimit(AbstractMove m) {
@@ -150,47 +170,67 @@ public class SI {
     }
 
     // TODO More methods called by GUI
-
-    void projectilesCollision (){
-//        for(Projectile l : ls){
-        List<Positionable> ps = new ArrayList<>();
-        ps.addAll(ships);
-        ps.addAll(shipBombs);
-            for(Positionable p : ps){
-                if(collision(gunProjectile,p)){
-//                    shipBombs.remove(l);
-                    gunProjectile = null;
+    void projectilesCollision(List<Positionable> ps, Positionable pos) {
+        for (Positionable p : ps) {
+            if (collision(p, pos)) {
+                if (ships.contains(p)) {
                     ships.remove(p);
-                    if(shipBombs.contains(p)){
-                        shipBombs.remove(p);
+                    if (p.getClass() == BattleCruiser.class) {
+                        points += BattleCruiser.BATTLE_CRUISER_POINTS;
+                    } else if (p.getClass() == Frigate.class) {
+                        points += Frigate.FRIGATE_POINTS;
+                    } else {
+                        points += Bomber.BOMBER_POINTS;
                     }
-                    break;
+                    accelerateSpaceships();
+                } else {
+                    shipBombs.remove(p);
                 }
+                EventBus.INSTANCE.publish(new ModelEvent(ModelEvent.Type.GUN_HIT_SHIP, p));
+
+                if (pos instanceof Projectile) {
+                    gunProjectile = null;
+                    break;
+                } else {
+                    EventBus.INSTANCE.publish(new ModelEvent(ModelEvent.Type.BOMB_HIT_GUN, pos));
+                }
+            } else if (hitBorder(p)) {
+                shipBombs.remove(p);
+                EventBus.INSTANCE.publish(new ModelEvent(ModelEvent.Type.BOMB_HIT_GROUND, p));
             }
-//        }
+        }
+
     }
 
-    boolean collision(Projectile pro, Positionable pos){
-        if(overlapX(pro,pos) && overlapY(pro,pos)){
+    boolean collision(Positionable p1, Positionable p2) {
+        if (overlapX(p1, p2) && overlapY(p1, p2)) {
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }
 
-    boolean overlapY(Projectile pro, Positionable pos){
-        for (int i = 0; i<= pro.getHeight(); i++) {
-            if (pos.getY() <= pro.getY()+i && pro.getY()+i <= pos.getY() + pos.getHeight()){
+    boolean hitBorder(Positionable pos) {
+        double y = pos.getY();
+        if (y < OUTER_SPACE_HEIGHT || GAME_HEIGHT - GROUND_HEIGHT < y) {
+            return true;
+        }
+
+        return false;
+    }
+
+    boolean overlapY(Positionable p1, Positionable p2) {
+        for (int i = 0; i <= p1.getHeight(); i++) {
+            if (p2.getY() <= p1.getY() + i && p1.getY() + i <= p2.getY() + p2.getHeight()) {
                 return true;
             }
         }
         return false;
     }
 
-    boolean overlapX(Projectile pro, Positionable pos){
-        for (int i = 0; i<= pro.getWidth(); i++) {
-            if (pos.getX() <= pro.getX()+i && pro.getX()+i <= pos.getX() + pos.getWidth()){
+    boolean overlapX(Positionable p1, Positionable p2) {
+        for (int i = 0; i <= p1.getWidth(); i++) {
+            if (p2.getX() <= p1.getX() + i && p1.getX() + i <= p2.getX() + p2.getWidth()) {
                 return true;
             }
         }
@@ -218,33 +258,28 @@ public class SI {
         return ms;
     }
 
-/*    List<Projectile> getProjectiles(List<Movable> ms){
-        List<Projectile> ls = new ArrayList<>();
-        for (Movable m : ms) {
-            if (m instanceof Projectile) {
-                ls.add((Projectile) m);
-            }
-        }
-        return ls;
-    }*/
-
 
     public int getPoints() {
         return points;
     }
 
-/*    public Gun getGun() {
-        return gun;
-    }
-
-    public void accelerateGun(double d) {
-        if (Math.abs(gun.getDx()) != GUN_MAX_DX+d) {
-            gun.setDx(gun.getDx() + d);
-        }
-    }*/
-
     public void moveGun(double dx, double dy) {
         gun.setDx(dx);
         gun.setDy(dy);
+    }
+
+    void accelerateSpaceships(){
+        for (AbstractSpaceship s : ships) {
+            if (!(s.getDx() >= SHIP_MAX_DX)&& ships.size() == DIFFICULTY) {
+                s.setDx(s.getDx() + sgn(s.getDx()));
+            }
+        }
+    }
+
+    int sgn(double d){
+        if(d<0){
+            return -1;
+        }
+        return  1;
     }
 }
