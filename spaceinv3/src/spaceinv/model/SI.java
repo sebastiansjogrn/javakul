@@ -32,7 +32,6 @@ public class SI {
     public static final int SHIP_WIDTH = 20;
     public static final int SHIP_HEIGHT = 20;
     public static final int SHIP_MAX_DX = 3;
-    public static final int SHIP_MIN_DX = 1;
     public static final int SHIP_MAX_DY = 20;
     public static final int GUN_WIDTH = 20;
     public static final int GUN_HEIGHT = 20;
@@ -47,15 +46,13 @@ public class SI {
     public static final long HALF_SEC = 500_000_000;
     public static final long TENTH_SEC = 100_000_000;
     public static final long ACTUAL_HALF_SEC = 50;
-    int time = 0;
 
     private static final Random rand = new Random();
 
     // TODO More references here
 
-                                            //Ships speed?
-                                            //Music!!
-                                            //Acceleration for gun
+    //Music!!
+    //Acceleration for gun
 
 
     private final Gun gun;
@@ -64,8 +61,8 @@ public class SI {
     private final List<Projectile> shipBombs = new ArrayList<>();
     private Projectile gunProjectile;
     private int points;
-
     // TODO Constructor here
+
     public SI(Gun gun, List<AbstractSpaceship> ships) {
         this.gun = gun;
         this.ships = ships;
@@ -77,9 +74,10 @@ public class SI {
     private long lastTimeForMove;
     private long lastTimeForFire;
     private int shipToMove = 0;
+    private int time = 0;
+
 
     // ------ Game loop (called by timer) -----------------
-
     public void update(long now) {
         time++;
 
@@ -94,9 +92,14 @@ public class SI {
         List<Positionable> ps = getPositionables();
         List<Movable> ms = getMovables(ps);
 
+        gunCollision();
+
         for (Movable m : ms) {
             m.move();
         }
+
+        ships.get(ships.size() - 1 - (shipToMove % ships.size())).move();
+        shipToMove++;
 
 
         /*
@@ -117,6 +120,7 @@ public class SI {
 
         if (collision) {
             for (AbstractSpaceship s : ships) {
+                s.setX(s.getX() - SHIP_MAX_DX * sgn(s.getDx()));
                 s.setDx(-s.getDx());
                 s.setDy(SHIP_MAX_DY);
             }
@@ -158,8 +162,8 @@ public class SI {
     }
 
 
-    // ---------- Interaction with GUI  -------------------------
 
+    // ---------- Interaction with GUI  -------------------------
     public void fireGun() {
         // TODO
         if (gunProjectile == null) {
@@ -169,7 +173,21 @@ public class SI {
         }
     }
 
+    private void gunCollision() {
+        if (0 < gun.getDx() && shipHitRightLimit(gun)) {
+            gun.setDx(0);
+        } else if (gun.getDx() < 0 && shipHitLeftLimit(gun)) {
+            gun.setDx(0);
+        }
+    }
+
+    public void moveGun(double dx, double dy) {
+        gun.setDx(/*gun.getDx()+*/dx);
+        gun.setDy(/*gun.getDy()+*/dy);
+    }
+
     // TODO More methods called by GUI
+
     void projectilesCollision(List<Positionable> ps, Positionable pos) {
         for (Positionable p : ps) {
             if (collision(p, pos)) {
@@ -182,7 +200,6 @@ public class SI {
                     } else {
                         points += Bomber.BOMBER_POINTS;
                     }
-                    accelerateSpaceships();
                 } else {
                     shipBombs.remove(p);
                 }
@@ -252,7 +269,8 @@ public class SI {
         List<Movable> ms = new ArrayList<>();
         for (Positionable p : ps) {
             if (p instanceof Movable) {
-                ms.add((Movable) p);
+                if (!(p instanceof AbstractSpaceship))
+                    ms.add((Movable) p);
             }
         }
         return ms;
@@ -263,23 +281,12 @@ public class SI {
         return points;
     }
 
-    public void moveGun(double dx, double dy) {
-        gun.setDx(dx);
-        gun.setDy(dy);
-    }
-
-    void accelerateSpaceships(){
-        for (AbstractSpaceship s : ships) {
-            if (!(s.getDx() >= SHIP_MAX_DX)&& ships.size() == DIFFICULTY) {
-                s.setDx(s.getDx() + sgn(s.getDx()));
-            }
-        }
-    }
-
-    int sgn(double d){
-        if(d<0){
+    int sgn(double d) {
+        if (d < 0) {
             return -1;
+        } else if (d > 0) {
+            return 1;
         }
-        return  1;
+        return 0;
     }
 }

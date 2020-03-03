@@ -48,4 +48,6 @@ public abstract class AbstractPosition implements Positionable{
     public void setHeight(double height) {
         this.height = height;
     }
+
+
 }

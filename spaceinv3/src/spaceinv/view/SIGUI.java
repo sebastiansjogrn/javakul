@@ -1,5 +1,6 @@
 package spaceinv.view;
 
+import com.sun.media.jfxmedia.AudioClip;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -152,14 +153,14 @@ public class SIGUI extends Application implements EventHandler {
     private void toggleMusic() {
         // TODO Optional
         out.println("toggle");
-       /* AudioClip music = FileService.getSound("music");
-        if (music.isPlaying()) {
-            music.stop();
-            //setCheckMenuItemSelected("Music", "Play", false);
-        } else {
-            music.play(0.1);
-            //setCheckMenuItemSelected("Music", "Play", true);
-        }*/
+//        AudioClip music = FileService.getSound("music");
+//        if (music.isPlaying()) {
+//            music.stop();
+//            //setCheckMenuItemSelected("Music", "Play", false);
+//        } else {
+//            music.play(0.1);
+//            //setCheckMenuItemSelected("Music", "Play", true);
+//        }
     }
 
     // --- Handling events coming form the model -----

@@ -29,6 +29,7 @@ public class Test {
 //        out.println(g.fire());
 //        out.println(Gun.class.getTypeName());
 //        out.println(si.getPositionables().get(0).getClass().toString());
+        out.println(-4%3);
     }
 
 
